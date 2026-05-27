@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const PagoSchema = Schema({
+const CarritoCompraSchema = Schema({
     idpedido: {
         type: mongoose.Schema.Types.ObjectId, ref: 'Pedido',
         required: true
