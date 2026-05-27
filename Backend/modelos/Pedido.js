@@ -5,32 +5,52 @@ const PedidoSchema = Schema({
         type: String,
         required: true
     },
-    fecha: {
+    fechapedido: {
         type: Date,
-        required: true,
         default: Date.now
     },
-    estado: {
+    estadopedido: {
         type: String,
         required: true
     },
-    cliente: {
+    nombrecliente: { // nombre del cliente,
+                    // se referencia a tabla Cliente
         type: mongoose.Schema.Types.ObjectId, ref: 'Cliente',
         required: true
     }, //Para referenciar al cliente, se puede extraer todos los datos de ahi.
 
-    producto: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'Producto',
+    correocliente: { // correo del cliente,
+                    // se referencia a tabla Cliente
+        type: mongoose.Schema.Types.ObjectId, ref: 'Cliente',
         required: true
-    }, //Para referenciar al producto, se puede extraer todos los datos de ahi.
-    
-    total: {
-        type: Number,
+    }, //Para referenciar al cliente, se puede extraer todos los datos de ahi.
+
+    idproducto:  {  //Id del producto, para sacar costo 
+                    // se referencia a tabla Producto
+        type: mongoose.Schema.Types.ObjectId, ref: 'Producto',
         required: true
     },
 
+    precioproducto: { // precio del producto,
+                    // se referencia a tabla Producto
+        type: mongoose.Schema.Types.ObjectId, ref: 'Producto',
+        required: true
+    }, //Para referenciar al producto, se puede extraer todos los datos de ahi.
+
+    cantidadproducto: { // cantidad de productos ,
+                    // se referencia a tabla Producto
+        type: mongoose.Schema.Types.ObjectId, ref: 'Producto',
+        required: true
+    },
+    costopedido: { // variable donde se almacenara
+                //  el costo total de los pedidos
+        type: Number,
+        required: true
+    },
+    
     descripcion: {
         type: String,
+        required: true
     },
 
     direccion: {
