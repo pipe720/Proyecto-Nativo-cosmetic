@@ -13,11 +13,18 @@ const PagoSchema = Schema({
         type: String,
         required: true
     },
-    totalpago: { //totalpago = valor a pagar == costopedido, 
+    pagopedido: { //pagopedido = valor a pagar == costopedido, 
                 // se referencia a tabla Pedido 
         type: mongoose.Schema.Types.ObjectId, ref: 'Pedido',
-        required: true
-    }
+        required: null
+    },
+
+    pagoreserva: {// pagoreserva = Valor a pagar == precioservicio
+                //Para sacar costo del servicio en la reserva, 
+                // se referencia a tabla Servicio 
+        type: mongoose.Schema.Types.ObjectId, ref: 'Servicio',
+        required: null
+    },
 });
 
 module.exports = model("Pago", ArticuloSchema, "pagos");
