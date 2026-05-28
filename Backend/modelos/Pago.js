@@ -13,15 +13,15 @@ const PagoSchema = Schema({
         type: String,
         required: true
     },
-    pagopedido: { //pagopedido = valor a pagar == costopedido, 
-                // se referencia a tabla Pedido 
+    pedido: {   // para sacar costo del pedido
+                // //para referenciar al pedido, se puede extraer todos los datos de ahi
         type: mongoose.Schema.Types.ObjectId, ref: 'Pedido',
         required: null
     },
 
-    pagoreserva: {// pagoreserva = Valor a pagar == precioservicio
+    servicio: {
                 //Para sacar costo del servicio en la reserva, 
-                // se referencia a tabla Servicio 
+                // //para referenciar al producto, se pued extraer todos los datos de ahi
         type: mongoose.Schema.Types.ObjectId, ref: 'Servicio',
         required: null
     },

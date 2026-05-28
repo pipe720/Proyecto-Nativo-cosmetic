@@ -9,25 +9,16 @@ const ReservaHoraSchema = Schema({
         type: Date,
         required: true
     },
-    nombrecliente: { // para obtener el nombre del cliente
-                     // se referencia a tabla cliente
+    cliente: { // para obtener el nombre y correo del cliente
+                     // //para referenciar al cliente, se pued extraer todos los datos de ahi
         type: mongoose.Schema.Types.ObjectId, ref: "Cliente",
         required: true
     },
-    correocliente: { //para obtener correo del cliente
-                    // se referencia a tabla Cliente
-        type: mongoose.Schema.Types.ObjectId, ref: "Cliente",
-        required: true
-    },
-    idservicio: { //para obtener id del servicio, 
-                // se referencia a tabla Servicio
+    servicio: { //para obtener id y precio del servicio, 
+                // //para referenciar al servicio, se pued extraer todos los datos de ahi
         type: mongoose.Schema.Types.ObjectId, ref: 'Servicio',
         required: true
-    },
-    precioservicio: {
-        type: mongoose.Schema.Types.ObjectId, ref: "Servicio",
-        required: true
-    },
+    }
 });
 
 
