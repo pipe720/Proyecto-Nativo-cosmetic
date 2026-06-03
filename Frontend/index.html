@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nativo Cosmetic | Cosmética capilar natural</title>
+    <meta
+      name="description"
+      content="Cosmética capilar natural, tinturas orgánicas y salón consciente en Providencia. Compra productos Nativo o reserva tu hora."
+    />
+    <link rel="preconnect" href="https://nativocosmetic.com" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#inicio" aria-label="Inicio Nativo Cosmetic">
+        <img src="https://nativocosmetic.com/cdn/shop/files/logo_nativo.png?v=1739992459&width=140" alt="Nativo Cosmetic" />
+      </a>
+
+      <button class="icon-button nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="#productos">Productos</a>
+        <a href="#diagnostico">Diagnóstico</a>
+        <a href="#salon">Salón</a>
+        <a href="#historia">Marca</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="ghost-action" href="https://www.agendapro.com/" target="_blank" rel="noreferrer">
+          <i data-lucide="calendar-days"></i>
+          Reservar
+        </a>
+        <button class="icon-button cart-open" type="button" aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="inicio">
+      <section class="hero">
+        <picture class="hero-media">
+          <img
+            src="https://nativocosmetic.com/cdn/shop/files/NZ6_8050_0249fee2-a649-4ac4-bbe6-d73c460f0bed.jpg?v=1739990326&width=3200"
+            alt="Productos Nativo en un entorno natural"
+          />
+        </picture>
+        <div class="hero-content">
+          <p class="eyebrow">Cosmética capilar natural y consciente</p>
+          <h1>Cuida tu cabello con fórmulas inspiradas en el sur de Chile.</h1>
+          <p>
+            Compra productos libres de sulfatos, parabenos y siliconas, o agenda una atención en la primera peluquería orgánica de Chile.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#productos">
+              <i data-lucide="shopping-bag"></i>
+              Comprar productos
+            </a>
+            <a class="button secondary" href="https://www.agendapro.com/" target="_blank" rel="noreferrer">
+              <i data-lucide="calendar-check"></i>
+              Reservar en Agendapro
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Beneficios de compra">
+        <article>
+          <i data-lucide="leaf"></i>
+          <strong>Ingredientes naturales</strong>
+          <span>Extractos y aceites de origen botánico.</span>
+        </article>
+        <article>
+          <i data-lucide="truck"></i>
+          <strong>Envios a todo Chile</strong>
+          <span>Retiro disponible en Providencia.</span>
+        </article>
+        <article>
+          <i data-lucide="scissors"></i>
+          <strong>Salón orgánico</strong>
+          <span>Servicios capilares con enfoque consciente.</span>
+        </article>
+      </section>
+
+      <section class="section diagnostic" id="diagnostico">
+        <div class="section-heading">
+          <p class="eyebrow">Elige por necesidad</p>
+          <h2>Encuentra rápido lo que tu cabello necesita.</h2>
+        </div>
+        <div class="need-grid" role="list">
+          <button class="need-card active" type="button" data-filter="todos">
+            <i data-lucide="sparkles"></i>
+            <span>Todo</span>
+          </button>
+          <button class="need-card" type="button" data-filter="hidratacion">
+            <i data-lucide="droplets"></i>
+            <span>Hidratación</span>
+          </button>
+          <button class="need-card" type="button" data-filter="caida">
+            <i data-lucide="sprout"></i>
+            <span>Caída y fuerza</span>
+          </button>
+          <button class="need-card" type="button" data-filter="detox">
+            <i data-lucide="waves"></i>
+            <span>Detox</span>
+          </button>
+          <button class="need-card" type="button" data-filter="color">
+            <i data-lucide="palette"></i>
+            <span>Color orgánico</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="section products-section" id="productos">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Tienda</p>
+            <h2>Productos destacados</h2>
+          </div>
+          <a class="text-link" href="https://nativocosmetic.com/collections/cabello" target="_blank" rel="noreferrer">
+            Ver catálogo actual
+            <i data-lucide="arrow-up-right"></i>
+          </a>
+        </div>
+        <div class="product-grid" data-product-grid></div>
+      </section>
+
+      <section class="booking-band" id="salon">
+        <div>
+          <p class="eyebrow">Salon en Providencia</p>
+          <h2>Reserva tintura orgánica, diagnóstico o tratamiento capilar.</h2>
+          <p>
+            Agenda tu hora en pocos pasos y vive la experiencia Nativo en Holanda 099, Studio 603.
+          </p>
+        </div>
+        <a class="button primary dark" href="https://www.agendapro.com/" target="_blank" rel="noreferrer">
+          <i data-lucide="calendar-days"></i>
+          Tomar hora en Agendapro
+        </a>
+      </section>
+
+      <section class="section story" id="historia">
+        <img
+          src="https://nativocosmetic.com/cdn/shop/files/img47c.jpg?v=1740169688&width=1500"
+          alt="Salon Nativo Cosmetic"
+        />
+        <div>
+          <p class="eyebrow">Marca con origen</p>
+          <h2>Fórmulas creadas desde una peluquería orgánica.</h2>
+          <p>
+            Nativo combina experiencia profesional, materias primas naturales y una mirada sustentable del cuidado capilar.
+            La nueva web debe convertir esa historia en confianza, compra y reserva.
+          </p>
+          <ul class="story-list">
+            <li><i data-lucide="check"></i> Productos organizados por problema capilar.</li>
+            <li><i data-lucide="check"></i> Compra simple con carrito visible.</li>
+            <li><i data-lucide="check"></i> Reserva directa a Agendapro.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <aside class="cart-panel" aria-hidden="true">
+      <div class="cart-header">
+        <div>
+          <p class="eyebrow">Pedido</p>
+          <h2>Carrito de compra</h2>
+        </div>
+        <button class="icon-button cart-close" type="button" aria-label="Cerrar carrito">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-empty" data-cart-empty>
+        <i data-lucide="shopping-bag"></i>
+        <p>Agrega productos para iniciar tu pedido.</p>
+      </div>
+      <div class="cart-footer">
+        <div class="total-row">
+          <span>Total</span>
+          <strong data-cart-total>$0 CLP</strong>
+        </div>
+        <button class="button primary full" type="button" data-checkout>
+          <i data-lucide="credit-card"></i>
+          Continuar pago
+        </button>
+        <a class="button secondary full" href="https://www.agendapro.com/" target="_blank" rel="noreferrer">
+          <i data-lucide="calendar-check"></i>
+          Reservar servicio
+        </a>
+      </div>
+    </aside>
+    <div class="overlay" data-overlay></div>
+
+    <footer class="site-footer">
+      <strong>Nativo Cosmetic</strong>
+      <span>Cosmética capilar natural, tienda online y salón orgánico.</span>
+    </footer>
+  </body>
+</html>
