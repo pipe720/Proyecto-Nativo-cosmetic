@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, mongoose } = require("mongoose");
 
 const ReservaHoraSchema = Schema({
     idreserva: {
@@ -9,17 +9,18 @@ const ReservaHoraSchema = Schema({
         type: Date,
         required: true
     },
-    cliente: { // para obtener el nombre y correo del cliente
-                     // //para referenciar al cliente, se pued extraer todos los datos de ahi
-        type: mongoose.Schema.Types.ObjectId, ref: "Cliente",
+    cliente: { 
+        // Usamos Schema.Types.ObjectId porque ya importamos Schema arriba
+        type: Schema.Types.ObjectId, 
+        ref: "Cliente",
         required: true
     },
-    servicio: { //para obtener id y precio del servicio, 
-                // //para referenciar al servicio, se pued extraer todos los datos de ahi
-        type: mongoose.Schema.Types.ObjectId, ref: 'Servicio',
+    servicio: { 
+        type: String, 
+        ref: 'Servicio',
         required: true
     }
 });
 
-
-module.exports = model("ReservaHora", ArticuloSchema, "reservahoras");
+// El tercer parámetro es el nombre de la colección en la base de datos
+module.exports = model("ReservaHora", ReservaHoraSchema, "reservahoras");
