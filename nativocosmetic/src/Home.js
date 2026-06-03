@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
   CalendarCheck,
@@ -37,6 +38,7 @@ const icons = {
 const formatPrice = (value) => (value ? `$${value.toLocaleString("es-CL")} CLP` : "Servicio");
 
 function Home() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [cart, setCart] = useState({});
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -82,10 +84,20 @@ function Home() {
   };
 
   const checkoutByEmail = () => {
-    const detail = cartItems.map((item) => `${item.quantity} x ${item.name}`).join(", ");
-    const subject = encodeURIComponent("Pedido Nativo Cosmetic");
-    const body = encodeURIComponent(`Hola, quiero confirmar este pedido: ${detail || "sin productos aún"}.`);
-    window.location.href = `mailto:contacto@nativocosmetic.com?subject=${subject}&body=${body}`;
+    if (!cartItems.length) {
+      setIsCartOpen(true);
+      return;
+    }
+
+    const order = {
+      id: `PED-${Date.now()}`,
+      items: cartItems,
+      total: cartTotal,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("nativoCheckout", JSON.stringify(order));
+    navigate("/pago");
   };
 
   return (
