@@ -19,4 +19,4 @@ const ServicioSchema = Schema({
     }
 });
 
-module.exports = model("Servicio", ArticuloSchema, "servicios");
+module.exports = model("Servicio", ServicioSchema, "servicios");
