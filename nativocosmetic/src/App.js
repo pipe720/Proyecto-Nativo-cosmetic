@@ -1,17 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { MiContextoProvider } from "./MiContexto";
-import Home from './Home';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./Home.js";
 
-function App() {                    
-  return (   
-    <MiContextoProvider>
+function App() {
+  return (
     <Router>
-      <Routes>         
-         <Route path="/" element={<Home />} />
+      <Routes>
+        <Route path="/" element={<Home />} />
       </Routes>
     </Router>
-  </MiContextoProvider>  
-    /*AQUI SE VAN A CARGAS LAS RUTAS con react-router-do */
   );
 }
 
