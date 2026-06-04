@@ -505,18 +505,6 @@ document.getElementById("cancelar-reserva-btn")
               Eliminar Reserva
             </button>
 
-            <button
-        id="editar-reserva"
-        style="flex:1; 
-        padding:10px; 
-        background:#0277bd; 
-        color:white; border:none; 
-        border-radius:4px; 
-        cursor:pointer;"
-      >
-        Editar Reserva
-      </button>
-
           </div>
         `;
 
@@ -590,7 +578,7 @@ document
       .remove();
   });
 
-});
+          });
 
       } catch (error) {
 
@@ -603,60 +591,149 @@ document
       }
 
     });
-// Lógica de editar
-document.getElementById("editar-reserva").addEventListener("click", () => {
+
+});
+
+
+// Para editar
+document.getElementById("editar-reserva-btn")
+?.addEventListener("click", () => {
+
   const modalHTML = `
-    <div id="editar-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:9999;">
-      <div style="background:white; padding:25px; border-radius:10px; width:350px; color:black; font-family:sans-serif;">
+    <div id="editar-modal" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    ">
+      <div style="
+        background: white;
+        width: 380px;
+        padding: 25px;
+        border-radius: 10px;
+        color: black;
+        font-family: sans-serif;
+      ">
         <h3>Editar Reserva</h3>
-        <form id="form-editar" style="display:flex; flex-direction:column; gap:10px;">
-          <label>Fecha:</label>
-          <input type="date" id="editar-dia" value="${reservaEncontrada.dia.split('T')[0]}" required>
-          <label>Hora:</label>
-          <input type="time" id="editar-hora" value="${reservaEncontrada.hora}" required>
-          <label>Profesional:</label>
-          <input type="text" id="editar-profesional" value="${reservaEncontrada.profesional}" required>
-          <button type="submit" style="background:#0277bd; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">Guardar Cambios</button>
-          <button type="button" id="cerrar-editar" style="background:#e0e0e0; padding:10px; border:none; border-radius:4px; cursor:pointer;">Cancelar</button>
-        </form>
+
+        <label>Nombre utilizado en la reserva:</label>
+        <input type="text" id="buscar-cliente" style="width:100%; padding:8px; margin:8px 0; border:1px solid #ccc; border-radius:4px;">
+
+        <button id="buscar-reserva" style="width:100%; padding:10px; background:black; color:white; border:none; border-radius:4px; cursor:pointer;">
+          Buscar Reserva
+        </button>
+
+        <div id="resultado-reserva" style="margin-top:15px;"></div>
+
+        <button id="cerrar-editar-modal" style="width:100%; padding:10px; margin-top:15px; background:#e0e0e0; border:none; border-radius:4px; cursor:pointer;">
+          Cerrar
+        </button>
       </div>
     </div>
   `;
+
   document.body.insertAdjacentHTML("beforeend", modalHTML);
 
-  document.getElementById("cerrar-editar").addEventListener("click", () => {
+  document.getElementById("cerrar-editar-modal").addEventListener("click", () => {
     document.getElementById("editar-modal").remove();
   });
 
-  document.getElementById("form-editar").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const nuevosDatos = {
-      dia: document.getElementById("editar-dia").value,
-      hora: document.getElementById("editar-hora").value,
-      profesional: document.getElementById("editar-profesional").value
-    };
+  document.getElementById("buscar-reserva").addEventListener("click", async () => {
+    const nombreCliente = document.getElementById("buscar-cliente").value.trim();
+    if (!nombreCliente) {
+      alert("Ingrese un nombre.");
+      return;
+    }
 
     try {
-      const response = await fetch(`http://localhost:3900/api/reservas/${reservaEncontrada._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevosDatos)
-      });
+      const response = await fetch("http://localhost:3900/api/reservas");
+      const data = await response.json();
+      const reservas = data.reservas || [];
 
-      if (!response.ok) {
-        alert("No fue posible actualizar la reserva.");
+      const reservaEncontrada = reservas.find(
+        r => r.cliente.toLowerCase() === nombreCliente.toLowerCase()
+      );
+
+      const resultado = document.getElementById("resultado-reserva");
+
+      if (!reservaEncontrada) {
+        resultado.innerHTML = `<p style="color:red;">No se encontró una reserva a editar.</p>`;
         return;
       }
 
-      alert("✓ Reserva actualizada correctamente.");
-      document.getElementById("editar-modal").remove();
+      // Mostrar formulario de edición con datos precargados
+      resultado.innerHTML = `
+        <form id="form-editar" style="display:flex; flex-direction:column; gap:10px;">
+          <label>Cliente:</label>
+          <input type="text" id="editar-cliente" value="${reservaEncontrada.cliente}" required>
+
+          <label>Fecha:</label>
+          <input type="date" id="editar-dia" value="${reservaEncontrada.dia.split('T')[0]}" required>
+
+          <label>Hora:</label>
+          <input type="time" id="editar-hora" value="${reservaEncontrada.hora}" required>
+
+          <label>Profesional:</label>
+<select id="editar-profesional" required style="padding:8px; border:1px solid #ccc; border-radius:4px;">
+  <option value="">Selecciona un profesional...</option>
+  <option value="Felipe Valenzuela" ${reservaEncontrada.profesional === "Felipe Valenzuela" ? "selected" : ""}>Felipe Valenzuela</option>
+  <option value="Elías Sánchez" ${reservaEncontrada.profesional === "Elías Sánchez" ? "selected" : ""}>Elías Sánchez</option>
+  <option value="Renato Arcos" ${reservaEncontrada.profesional === "Renato Arcos" ? "selected" : ""}>Renato Arcos</option>
+</select>
+
+
+
+          <button type="submit" style="background:#0277bd; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">
+            Guardar Cambios
+          </button>
+        </form>
+      `;
+
+      // Listener para guardar cambios
+      document.getElementById("form-editar").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const nuevosDatos = {
+          cliente: document.getElementById("editar-cliente").value,
+          dia: document.getElementById("editar-dia").value,
+          hora: document.getElementById("editar-hora").value,
+          profesional: document.getElementById("editar-profesional").value
+        };
+
+        try {
+          const editar = await fetch(`http://localhost:3900/api/reservas/${reservaEncontrada._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nuevosDatos)
+          });
+
+          if (!editar.ok) {
+            alert("No fue posible editar la reserva.");
+            return;
+          }
+
+          alert("✓ Reserva actualizada correctamente.");
+          document.getElementById("editar-modal").remove();
+        } catch (error) {
+          console.error(error);
+          alert("Error de conexión con el servidor.");
+        }
+      });
+
     } catch (error) {
       console.error(error);
       alert("Error de conexión con el servidor.");
     }
   });
+
 });
-});
+
 renderProducts();
 renderCart();
 refreshIcons();
