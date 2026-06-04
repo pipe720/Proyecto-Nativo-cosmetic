@@ -75,6 +75,36 @@ router.patch("/productos/:id/stock", async (req, res) => {
     } catch (error) {
         return res.status(400).json({ error: "No se pudo actualizar el stock" });
     }
+
+// PUT - Modificar producto por ID
+router.put("/productos/:id", async (req, res) => {
+    try {
+        const producto = await Producto.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true } // devuelve el producto actualizado
+        );
+        if (!producto) return res.status(404).json({ error: "Producto no encontrado" });
+        return res.status(200).json(producto);
+    } catch (error) {
+        return res.status(400).json({ error: "No se pudo modificar el producto", detalle: error.message });
+    }
+});
+
+// DELETE - Eliminar producto por ID
+router.delete("/productos/:id", async (req, res) => {
+    try {
+        const producto = await Producto.findByIdAndDelete(req.params.id);
+        if (!producto) return res.status(404).json({ error: "Producto no encontrado" });
+        return res.status(200).json({ mensaje: "Producto eliminado correctamente" });
+    } catch (error) {
+        return res.status(500).json({ error: "Error interno al eliminar el producto" });
+    }
+});
+
+
+
+
 });
 
 // ─── CLIENTES ────────────────────────────────────────────────────────────────
@@ -131,13 +161,47 @@ router.get("/reservas", async (req, res) => {
     try {
         // Usamos la versión con .populate si tienes esas relaciones definidas en tu modelo, 
         // o simplemente ReservaHora.find() si prefieres una lista básica.
-        const reservas = await Reserva.find();
+        const reservas = await Reserva.find(); 
         return res.status(200).send({ status: "success", total: reservas.length, reservas });
     } catch (error) {
         console.error("Error al obtener reservas:", error);
         return res.status(500).send({ status: "error", message: error.message });
+    }   
+});
+
+// PUT - Editar reserva por ID
+router.put("/reservas/:id", async (req, res) => {
+    try {
+        const reservaActualizada = await Reserva.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        )
+
+        if (!reservaActualizada) {
+            return res.status(404).json({
+                status: "error",
+                message: "Reserva no encontrada"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Reserva actualizada correctamente",
+            reserva: reservaActualizada
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            message: "Error al actualizar la reserva",
+            detalle: error.message
+        });
     }
 });
+
+
+
 // DELETE - Eliminar reserva por ID
 router.delete("/reservas/:id", async (req, res) => {
     try {
@@ -165,4 +229,5 @@ router.delete("/reservas/:id", async (req, res) => {
 
     }
 });
+
 module.exports = router;
