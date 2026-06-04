@@ -1,5 +1,7 @@
+// URL externa utilizada para reservar servicios desde la tienda.
 const AGENDAPRO_URL = "https://www.agendapro.com/";
 
+// Catálogo temporal del frontend. Más adelante puede obtenerse desde la API del backend.
 const products = [
   {
     id: "acond-cola",
@@ -58,9 +60,11 @@ const products = [
   },
 ];
 
+// Estado local del carrito y utilidad para mostrar precios en pesos chilenos.
 const cart = new Map();
 const formatPrice = (value) => value ? `$${value.toLocaleString("es-CL")} CLP` : "Servicio";
 
+// Referencias a los elementos principales de la interfaz.
 const productGrid = document.querySelector("[data-product-grid]");
 const cartPanel = document.querySelector(".cart-panel");
 const overlay = document.querySelector("[data-overlay]");
@@ -75,6 +79,7 @@ document.querySelectorAll('a[href="https://www.agendapro.com/"]').forEach((link)
   link.href = AGENDAPRO_URL;
 });
 
+// Muestra los productos y aplica el filtro seleccionado por necesidad capilar.
 function renderProducts(filter = "todos") {
   const visibleProducts = filter === "todos" ? products : products.filter((product) => product.need === filter);
 
@@ -102,6 +107,7 @@ function renderProducts(filter = "todos") {
   refreshIcons();
 }
 
+// Actualiza productos, cantidades y total visibles dentro del carrito.
 function renderCart() {
   const items = [...cart.values()];
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -128,6 +134,7 @@ function renderCart() {
   `).join("");
 }
 
+// Agrega un producto al carrito o aumenta su cantidad actual.
 function addToCart(productId) {
   const product = products.find((item) => item.id === productId);
   if (!product) return;
@@ -138,6 +145,7 @@ function addToCart(productId) {
   openCart();
 }
 
+// Modifica la cantidad y elimina el producto cuando llega a cero.
 function updateQuantity(productId, direction) {
   const current = cart.get(productId);
   if (!current) return;
@@ -151,6 +159,13 @@ function updateQuantity(productId, direction) {
   renderCart();
 }
 
+// Elimina completamente un producto seleccionado del carrito.
+function removeFromCart(productId) {
+  cart.delete(productId);
+  renderCart();
+}
+
+// Controla la apertura y cierre visual del carrito lateral.
 function openCart() {
   cartPanel.classList.add("open");
   overlay.classList.add("open");
@@ -169,6 +184,7 @@ function refreshIcons() {
   }
 }
 
+// Delegación de eventos para productos, filtros, carrito y reservas.
 document.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add]");
   const increaseButton = event.target.closest("[data-increase]");
@@ -180,6 +196,7 @@ document.addEventListener("click", (event) => {
   if (addButton) addToCart(addButton.dataset.add);
   if (increaseButton) updateQuantity(increaseButton.dataset.increase, 1);
   if (decreaseButton) updateQuantity(decreaseButton.dataset.decrease, -1);
+  if (removeButton) removeFromCart(removeButton.dataset.remove);
 
   // Lógica de RF-07: Eliminar del carrito
 // Lógica de RF-15: Sistema de reservas y Formulario
@@ -292,20 +309,34 @@ document.querySelector(".cart-open").addEventListener("click", openCart);
 document.querySelector(".cart-close").addEventListener("click", closeCart);
 overlay.addEventListener("click", closeCart);
 
+// Abre o cierra el menú de navegación en pantallas pequeñas.
 navToggle.addEventListener("click", () => {
   const isOpen = nav.classList.toggle("open");
   navToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
+// Prepara el pedido, lo guarda temporalmente y redirige a la pestaña de pago.
 document.querySelector("[data-checkout]").addEventListener("click", () => {
-  const message = [...cart.values()]
-    .map((item) => `${item.quantity} x ${item.name}`)
-    .join(", ");
-  const subject = encodeURIComponent("Pedido Nativo Cosmetic");
-  const body = encodeURIComponent(`Hola, quiero confirmar este pedido: ${message || "sin productos aun"}.`);
-  window.location.href = `mailto:contacto@nativocosmetic.com?subject=${subject}&body=${body}`;
+  const items = [...cart.values()];
+
+  if (!items.length) {
+    alert("Agrega al menos un producto antes de continuar al pago.");
+    return;
+  }
+
+  const pedido = {
+    id: `PED-${Date.now()}`,
+    items,
+    total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    estado: "pendiente_pago",
+    fecha: new Date().toISOString(),
+  };
+
+  localStorage.setItem("nativoCheckout", JSON.stringify(pedido));
+  window.location.href = "pago.html";
 });
 
+// Render inicial de la tienda.
 renderProducts();
 renderCart();
 refreshIcons();

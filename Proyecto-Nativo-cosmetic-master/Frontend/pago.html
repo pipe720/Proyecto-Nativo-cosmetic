@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Pago seguro para pedidos de Nativo Cosmetic." />
+    <title>Pago seguro | Nativo Cosmetic</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="pago.js" defer></script>
+  </head>
+  <body>
+    <main class="payment-page">
+      <section class="payment-hero">
+        <a class="text-link" href="index.html">
+          <i data-lucide="arrow-left"></i>
+          Volver a la tienda
+        </a>
+        <div>
+          <p class="eyebrow">Pago seguro</p>
+          <h1>Finaliza tu compra</h1>
+          <p>Selecciona un medio de pago y completa tus datos de forma segura.</p>
+        </div>
+        <div class="secure-badges" aria-label="Seguridad del pago">
+          <span><i data-lucide="lock-keyhole"></i> Conexión HTTPS segura</span>
+          <span><i data-lucide="shield-check"></i> No almacenamos datos de tarjeta</span>
+        </div>
+      </section>
+
+      <section class="payment-layout">
+        <form class="payment-form" data-payment-form novalidate>
+          <div class="payment-block">
+            <div class="payment-block-heading">
+              <i data-lucide="credit-card"></i>
+              <div>
+                <h2>Medio de pago</h2>
+                <p>Elige tarjeta de débito o crédito.</p>
+              </div>
+            </div>
+            <div class="segmented-control" role="radiogroup" aria-label="Tipo de tarjeta">
+              <button class="active" type="button" data-payment-type="debito">Débito</button>
+              <button type="button" data-payment-type="credito">Crédito</button>
+            </div>
+          </div>
+
+          <div class="payment-block">
+            <div class="field-grid">
+              <label>
+                PSP configurado
+                <select data-provider>
+                  <option value="webpay">Webpay</option>
+                  <option value="mercadopago">Mercado Pago</option>
+                </select>
+              </label>
+              <label>
+                Ambiente
+                <select data-environment>
+                  <option value="sandbox">Sandbox</option>
+                  <option value="production">Producción</option>
+                </select>
+              </label>
+            </div>
+            <p class="provider-note" data-provider-note></p>
+          </div>
+
+          <div class="payment-block">
+            <div class="field-grid">
+              <label>
+                Nombre en la tarjeta
+                <input autocomplete="cc-name" name="cardName" placeholder="Nombre Apellido" />
+                <small data-error="cardName"></small>
+              </label>
+              <label>
+                Número de tarjeta
+                <input autocomplete="cc-number" inputmode="numeric" maxlength="23" name="cardNumber" placeholder="4242 4242 4242 4242" />
+                <small data-error="cardNumber"></small>
+              </label>
+              <label>
+                Vencimiento
+                <input autocomplete="cc-exp" inputmode="numeric" maxlength="5" name="expiry" placeholder="MM/AA" />
+                <small data-error="expiry"></small>
+              </label>
+              <label>
+                CVV
+                <input autocomplete="cc-csc" inputmode="numeric" maxlength="4" name="cvv" placeholder="123" type="password" />
+                <small data-error="cvv"></small>
+              </label>
+            </div>
+          </div>
+
+          <div class="payment-status idle" data-payment-status>
+            <span>El pago se procesa en menos de 10 segundos en este prototipo.</span>
+          </div>
+          <div class="transaction-card" data-transaction hidden></div>
+
+          <button class="button primary full payment-submit" type="submit" data-payment-submit>
+            <i data-lucide="lock-keyhole"></i>
+            Pagar ahora
+          </button>
+        </form>
+
+        <aside class="order-summary">
+          <p class="eyebrow">Resumen</p>
+          <h2>Pedido</h2>
+          <div class="summary-items" data-summary-items></div>
+          <div class="summary-total">
+            <span>Total a pagar</span>
+            <strong data-summary-total>$0 CLP</strong>
+          </div>
+          <div class="sandbox-help">
+            <strong>Tarjetas de prueba</strong>
+            <span>Aprobado: 4242 4242 4242 4242.</span>
+            <span>Rechazado: 4000 0000 0000 0002.</span>
+            <span>Error de conexión: 4000 0000 0000 9995.</span>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>
