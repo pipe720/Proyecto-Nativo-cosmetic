@@ -5,7 +5,7 @@ const path = require("path");
 const Producto = require("../modelos/Producto");
 const Cliente = require("../modelos/Cliente");
 const Servicio = require("../modelos/Servicio");
-const ReservaHora = require("../modelos/ReservaHora");
+const Reserva = require("../modelos/ReservaHora");
 
 const router = express.Router();
 
@@ -45,24 +45,21 @@ router.get("/productos/:id", async (req, res) => {
 });
 
 // POST - Crear producto (con imagen opcional)
-router.post("/productos", subidas.single("imagen"), async (req, res) => {
+router.post("/reservas", async (req, res) => {
     try {
-        const productoData = {
-            idproducto: req.body.idproducto,
-            nombreproducto: req.body.nombreproducto,
-            precioproducto: parseFloat(req.body.precioproducto),
-            descripcionproducto: req.body.descripcionproducto,
-            categoriaproducto: req.body.categoriaproducto,
-            stock: parseInt(req.body.stock),
-            fechavencimiento: req.body.fechavencimiento || Date.now(),
-            imagenUrl: req.file ? `/imagenes/articulos/${req.file.filename}` : null
-        };
-
-        const producto = new Producto(productoData);
-        await producto.save();
-        return res.status(201).json(producto);
+        console.log("Datos que llegaron del Frontend:", req.body);
+        
+        // Creamos una nueva reserva usando el modelo de tus compañeros
+        const nuevaReserva = new Reserva(req.body);
+        
+        // ¡La guardamos en MongoDB!
+        await nuevaReserva.save();
+        
+        console.log("¡Reserva guardada con éxito en MongoDB!");
+        res.status(200).send({ status: "success", message: "Reserva guardada" });
     } catch (error) {
-        return res.status(400).json({ error: "Datos de producto inválidos", detalle: error.message });
+        console.error("Error al guardar en MongoDB:", error);
+        res.status(500).send({ status: "error", message: "Error al guardar la reserva" });
     }
 });
 
@@ -115,34 +112,13 @@ router.get("/servicios", async (req, res) => {
     }
 });
 
+
 // ─── RESERVAS ────────────────────────────────────────────────────────────────
 
-// GET - Listar todas las reservas (con datos del cliente y servicio)
-router.get("/reservas", async (req, res) => {
-    try {
-        const reservas = await ReservaHora.find()
-            .populate("cliente", "nombre correo rut")
-            .populate("servicio", "nombreservicio precioservicio duracionservicio");
-        return res.status(200).send({ status: "success", total: reservas.length, reservas });
-    } catch (error) {
-        console.error("Error al obtener reservas:", error);
-        return res.status(500).send({ status: "error", message: error.message });
-    }
-});
-
-// Ruta para crear una nueva reserva (POST)
+// POST - Crear reserva
 router.post('/crear-reserva', async (req, res) => {
     try {
-        const { dia, hora, profesional, tipoCorte, cliente } = req.body;
-
-        const nuevaReserva = new ReservaHora({
-            dia,
-            hora,
-            profesional,
-            tipoCorte,
-            cliente
-        });
-
+        const nuevaReserva = new ReservaHora(req.body);
         await nuevaReserva.save();
         res.status(201).json({ mensaje: "Reserva creada con éxito", reserva: nuevaReserva });
     } catch (error) {
@@ -150,13 +126,16 @@ router.post('/crear-reserva', async (req, res) => {
     }
 });
 
-// Ruta para consultar las reservas (GET)
-router.get('/reservas', async (req, res) => {
+// GET - Listar todas las reservas
+router.get("/reservas", async (req, res) => {
     try {
-        const reservas = await ReservaHora.find();
-        res.status(200).json(reservas);
+        // Usamos la versión con .populate si tienes esas relaciones definidas en tu modelo, 
+        // o simplemente ReservaHora.find() si prefieres una lista básica.
+        const reservas = await ReservaHora.find(); 
+        return res.status(200).send({ status: "success", total: reservas.length, reservas });
     } catch (error) {
-        res.status(500).json({ mensaje: "Error al obtener reservas", error });
+        console.error("Error al obtener reservas:", error);
+        return res.status(500).send({ status: "error", message: error.message });
     }
 });
 

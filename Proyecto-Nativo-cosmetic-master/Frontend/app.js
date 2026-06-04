@@ -91,7 +91,7 @@ function renderProducts(filter = "todos") {
           <span class="price">${formatPrice(product.price)}</span>
           ${
             product.booking
-              ? `<a class="add-button" href="${AGENDAPRO_URL}" target="_blank" rel="noreferrer" aria-label="Reservar ${product.name}"><i data-lucide="calendar-plus"></i></a>`
+              ? `<button class="add-button" type="button" data-book="${product.id}" style="background-color: black; color: white; border-radius: 5px; padding: 5px 10px; cursor: pointer;">📅 Reservar</button>`
               : `<button class="add-button" type="button" data-add="${product.id}" aria-label="Agregar ${product.name}"><i data-lucide="plus"></i></button>`
           }
         </div>
@@ -122,6 +122,7 @@ function renderCart() {
         <button type="button" data-decrease="${item.id}" aria-label="Disminuir">-</button>
         <b>${item.quantity}</b>
         <button type="button" data-increase="${item.id}" aria-label="Aumentar">+</button>
+        <button type="button" data-remove="${item.id}" style="color: red; margin-left: 10px; border: none; background: transparent; cursor: pointer;" aria-label="Eliminar">🗑️</button>
       </div>
     </article>
   `).join("");
@@ -172,11 +173,112 @@ document.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add]");
   const increaseButton = event.target.closest("[data-increase]");
   const decreaseButton = event.target.closest("[data-decrease]");
+  const removeButton = event.target.closest("[data-remove]");
+  const bookButton = event.target.closest("[data-book]");
   const filterButton = event.target.closest("[data-filter]");
 
   if (addButton) addToCart(addButton.dataset.add);
   if (increaseButton) updateQuantity(increaseButton.dataset.increase, 1);
   if (decreaseButton) updateQuantity(decreaseButton.dataset.decrease, -1);
+
+  // Lógica de RF-07: Eliminar del carrito
+// Lógica de RF-15: Sistema de reservas y Formulario
+  if (bookButton) {
+    const productId = bookButton.dataset.book;
+    const producto = products.find(p => p.id === productId);
+    
+    const hoy = new Date();
+    const hoyStr = hoy.toISOString().split('T')[0];
+
+    const modalHTML = `
+      <div id="reserva-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <div style="background: white; padding: 25px; border-radius: 10px; width: 320px; color: black; font-family: sans-serif;">
+          <h3 style="margin-top: 0;">Reservar Hora</h3>
+          <p style="font-size: 14px; color: #555;">Servicio: <strong>${producto.name}</strong></p>
+          <form id="form-reserva" style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <label style="font-size: 13px; font-weight: bold;">Tu Nombre:</label><br>
+              <input type="text" id="reserva-cliente" required placeholder="Ej: Isidora Arellano" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div>
+              <label style="font-size: 13px; font-weight: bold;">Día:</label><br>
+              <input type="date" id="reserva-dia" min="${hoyStr}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div>
+              <label style="font-size: 13px; font-weight: bold;">Hora:</label><br>
+              <input type="time" id="reserva-hora" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div>
+              <label style="font-size: 13px; font-weight: bold;">Profesional a cargo:</label><br>
+              <select id="reserva-profesional" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">Selecciona un profesional...</option>
+                <option value="Felipe Valenzuela">Felipe Valenzuela</option>
+                <option value="Elías Sánchez">Elías Sánchez</option>
+                <option value="Renato Arcos">Renato Arcos</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 13px; font-weight: bold;">Tipo de corte:</label><br>
+              <select id="reserva-tipo" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">Selecciona un estilo...</option>
+                <option value="Corte Mujer">Corte Mujer</option>
+                <option value="Corte Hombre">Corte Hombre</option>
+                <option value="Tintura / Coloración">Tintura / Coloración</option>
+              </select>
+            </div>
+            <button type="submit" style="background: black; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold;">Confirmar Reserva</button>
+            <button type="button" id="cerrar-modal" style="background: #e0e0e0; color: black; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Cancelar</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    document.getElementById("cerrar-modal").addEventListener("click", () => {
+      document.getElementById("reserva-modal").remove();
+    });
+
+    document.getElementById("form-reserva").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const diaElegido = document.getElementById("reserva-dia").value;
+      const horaElegida = document.getElementById("reserva-hora").value;
+      
+      if (diaElegido === hoyStr) {
+        const horaActual = hoy.getHours() + ":" + hoy.getMinutes().toString().padStart(2, '0');
+        if (horaElegida < horaActual) {
+          alert("No puedes reservar en una hora que ya pasó.");
+          return;
+        }
+      }
+
+      // AQUÍ AGREGAMOS EL CLIENTE PARA QUE MONGODB LO ACEPTE
+      const datosReserva = {
+        cliente: document.getElementById("reserva-cliente").value,
+        dia: diaElegido,
+        hora: horaElegida,
+        profesional: document.getElementById("reserva-profesional").value,
+        tipoCorte: document.getElementById("reserva-tipo").value
+      };
+
+      try {
+        const response = await fetch("http://localhost:3900/api/reservas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosReserva)
+        });
+
+        if (response.ok) {
+          alert("Reserva de hora aceptada.\n\nTe hemos enviado una copia de la reserva a tu correo electrónico.");
+          document.getElementById("reserva-modal").remove();
+        } else {
+          alert("La reserva no se pudo guardar. Verifica tu Backend.");
+        }
+      } catch (error) {
+        console.error("Error conectando al backend:", error);
+        alert("Error de conexión con la base de datos.");
+      }
+    });
+  }
 
   if (filterButton) {
     document.querySelectorAll("[data-filter]").forEach((button) => button.classList.remove("active"));
