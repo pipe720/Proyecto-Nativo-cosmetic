@@ -6,6 +6,8 @@ function Stock() {
   const [error, setError] = useState('');
   const [stockEdicion, setStockEdicion] = useState({});
   const [actualizando, setActualizando] = useState({});
+  const [editando, setEditando] = useState(null);
+  const [formEdicion, setFormEdicion] = useState({});
 
   useEffect(() => {
     cargarProductos();
@@ -28,52 +30,74 @@ function Stock() {
   };
 
   const handleStockChange = (productoId, nuevoStock) => {
-    setStockEdicion({
-      ...stockEdicion,
-      [productoId]: nuevoStock
-    });
+    setStockEdicion({ ...stockEdicion, [productoId]: nuevoStock });
   };
 
   const actualizarStock = async (productoId) => {
     const nuevoStock = stockEdicion[productoId];
-
     if (nuevoStock === undefined || nuevoStock === '') {
       setError('Ingresa una cantidad válida');
       return;
     }
-
     try {
-      setActualizando({
-        ...actualizando,
-        [productoId]: true
-      });
-
+      setActualizando({ ...actualizando, [productoId]: true });
       const response = await fetch(
         `http://localhost:3900/api/productos/${productoId}/stock`,
         {
           method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stock: parseInt(nuevoStock) })
         }
       );
-
       if (!response.ok) throw new Error('Error al actualizar stock');
-
       await cargarProductos();
-      setStockEdicion({
-        ...stockEdicion,
-        [productoId]: ''
-      });
+      setStockEdicion({ ...stockEdicion, [productoId]: '' });
       setError('');
     } catch (err) {
       setError(`Error al actualizar: ${err.message}`);
     } finally {
-      setActualizando({
-        ...actualizando,
-        [productoId]: false
+      setActualizando({ ...actualizando, [productoId]: false });
+    }
+  };
+
+  // Eliminar producto
+  const eliminarProducto = async (productoId) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este producto?")) return;
+    try {
+      const response = await fetch(`http://localhost:3900/api/productos/${productoId}`, {
+        method: 'DELETE'
       });
+      if (!response.ok) throw new Error('Error al eliminar producto');
+      await cargarProductos();
+    } catch (err) {
+      setError(`Error al eliminar: ${err.message}`);
+    }
+  };
+
+  // Editar producto
+  const iniciarEdicion = (producto) => {
+    setEditando(producto._id);
+    setFormEdicion(producto);
+  };
+
+  const handleEdicionChange = (e) => {
+    const { name, value } = e.target;
+    setFormEdicion({ ...formEdicion, [name]: value });
+  };
+
+  const guardarEdicion = async () => {
+    try {
+      const response = await fetch(`http://localhost:3900/api/productos/${editando}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formEdicion)
+      });
+      if (!response.ok) throw new Error('Error al modificar producto');
+      await cargarProductos();
+      setEditando(null);
+      setFormEdicion({});
+    } catch (err) {
+      setError(`Error al modificar: ${err.message}`);
     }
   };
 
@@ -85,164 +109,64 @@ function Stock() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2 style={{ color: '#27AE60' }}>Visualizar stock en tiempo real</h2>
+      <h2 style={{ color: '#27AE60' }}>Gestión de productos y stock</h2>
 
-      <div style={{
-        padding: '10px',
-        marginBottom: '20px',
-        backgroundColor: '#D5F4E6',
-        borderRadius: '4px',
-        color: '#27AE60',
-        fontWeight: '500'
-      }}>
-      </div>
+      <button onClick={cargarProductos}>Actualizar ahora</button>
 
-      <button
-        onClick={cargarProductos}
-        style={{
-          padding: '10px 15px',
-          marginBottom: '20px',
-          backgroundColor: '#27AE60',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: '600'
-        }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1E8449'}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#27AE60'}
-      >
-        Actualizar ahora
-      </button>
-
-      {error && (
-        <div style={{
-          padding: '10px',
-          marginBottom: '15px',
-          backgroundColor: '#f8d7da',
-          color: '#721c24',
-          borderRadius: '4px'
-        }}>
-          {error}
-        </div>
-      )}
+      {error && <div style={{ color: 'red' }}>{error}</div>}
 
       {cargando ? (
-        <p>Cargando stock...</p>
-      ) : productos.length === 0 ? (
-        <p>No hay productos para mostrar.</p>
+        <p>Cargando...</p>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            marginTop: '20px'
-          }}>
-            <thead>
-              <tr style={{ backgroundColor: '#D5F4E6', borderBottom: '3px solid #27AE60' }}>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #27AE60', color: '#27AE60', fontWeight: '700' }}>Código</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #27AE60', color: '#27AE60', fontWeight: '700' }}>Producto</th>
-                <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #27AE60', color: '#27AE60', fontWeight: '700' }}>Stock actual</th>
-                <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #27AE60', color: '#27AE60', fontWeight: '700' }}>Nuevo stock</th>
-                <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #27AE60', color: '#27AE60', fontWeight: '700' }}>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productos.map((producto) => (
-                <tr key={producto._id} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '12px' }}><strong>{producto.idproducto}</strong></td>
-                  <td style={{ padding: '12px' }}>{producto.nombreproducto}</td>
-                  <td style={{
-                    padding: '12px',
-                    textAlign: 'center',
-                    color: 'white',
-                    backgroundColor: getStockColor(producto.stock),
-                    fontWeight: 'bold',
-                    borderRadius: '4px'
-                  }}>
-                    {producto.stock}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Stock actual</th>
+              <th>Nuevo stock</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {productos.map((producto) => (
+              <tr key={producto._id}>
+                <td>{producto.idproducto}</td>
+                <td>
+                  {editando === producto._id ? (
                     <input
-                      type="number"
-                      value={stockEdicion[producto._id] || ''}
-                      onChange={(e) => handleStockChange(producto._id, e.target.value)}
-                      placeholder="Nuevo stock"
-                      style={{
-                        padding: '6px',
-                        width: '100px',
-                        borderRadius: '4px',
-                        border: '1px solid #ddd'
-                      }}
+                      type="text"
+                      name="nombreproducto"
+                      value={formEdicion.nombreproducto || ''}
+                      onChange={handleEdicionChange}
                     />
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => actualizarStock(producto._id)}
-                      disabled={actualizando[producto._id]}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: actualizando[producto._id] ? '#ccc' : '#27AE60',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: actualizando[producto._id] ? 'not-allowed' : 'pointer',
-                        fontWeight: '600'
-                      }}
-                      onMouseOver={(e) => !actualizando[producto._id] && (e.currentTarget.style.backgroundColor = '#1E8449')}
-                      onMouseOut={(e) => !actualizando[producto._id] && (e.currentTarget.style.backgroundColor = '#27AE60')}
-                    >
-                      {actualizando[producto._id] ? 'Guardando...' : 'Actualizar'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div style={{
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: '#D5F4E6',
-            borderRadius: '8px',
-            border: '2px solid #27AE60'
-          }}>
-            <h4 style={{ color: '#27AE60', marginTop: '0' }}>Leyenda de stock</h4>
-            <p>
-              <span style={{
-                display: 'inline-block',
-                width: '12px',
-                height: '12px',
-                backgroundColor: '#dc3545',
-                marginRight: '8px',
-                borderRadius: '2px'
-              }}></span>
-              Stock bajo (≤ 10 unidades)
-            </p>
-            <p>
-              <span style={{
-                display: 'inline-block',
-                width: '12px',
-                height: '12px',
-                backgroundColor: '#ffc107',
-                marginRight: '8px',
-                borderRadius: '2px'
-              }}></span>
-              Stock medio (11-30 unidades)
-            </p>
-            <p>
-              <span style={{
-                display: 'inline-block',
-                width: '12px',
-                height: '12px',
-                backgroundColor: '#28a745',
-                marginRight: '8px',
-                borderRadius: '2px'
-              }}></span>
-              Stock adecuado (> 30 unidades) - Verde nativo
-            </p>
-          </div>
-        </div>
+                  ) : (
+                    producto.nombreproducto
+                  )}
+                </td>
+                <td style={{ backgroundColor: getStockColor(producto.stock), color: 'white' }}>
+                  {producto.stock}
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={stockEdicion[producto._id] || ''}
+                    onChange={(e) => handleStockChange(producto._id, e.target.value)}
+                  />
+                </td>
+                <td>
+                  <button onClick={() => actualizarStock(producto._id)}>Actualizar stock</button>
+                  {editando === producto._id ? (
+                    <button onClick={guardarEdicion}>Guardar</button>
+                  ) : (
+                    <button onClick={() => iniciarEdicion(producto)}>Editar</button>
+                  )}
+                  <button onClick={() => eliminarProducto(producto._id)}>Eliminar</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
