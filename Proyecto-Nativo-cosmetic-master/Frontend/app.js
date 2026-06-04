@@ -687,6 +687,13 @@ document.getElementById("editar-reserva-btn")
   <option value="Renato Arcos" ${reservaEncontrada.profesional === "Renato Arcos" ? "selected" : ""}>Renato Arcos</option>
 </select>
 
+          <label>Tipo de corte:</label>
+    <select id="editar-tipo" required style="padding:8px; border:1px solid #ccc; border-radius:4px;">
+      <option value="">Selecciona un estilo...</option>
+      <option value="Corte Mujer" ${reservaEncontrada.tipoCorte === "Corte Mujer" ? "selected" : ""}>Corte Mujer</option>
+      <option value="Corte Hombre" ${reservaEncontrada.tipoCorte === "Corte Hombre" ? "selected" : ""}>Corte Hombre</option>
+      <option value="Tintura / Coloración" ${reservaEncontrada.tipoCorte === "Tintura / Coloración" ? "selected" : ""}>Tintura / Coloración</option>
+    </select>
 
 
           <button type="submit" style="background:#0277bd; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">
