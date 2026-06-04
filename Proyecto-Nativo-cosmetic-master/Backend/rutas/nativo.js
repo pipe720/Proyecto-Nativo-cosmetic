@@ -118,7 +118,7 @@ router.get("/servicios", async (req, res) => {
 // POST - Crear reserva
 router.post('/crear-reserva', async (req, res) => {
     try {
-        const nuevaReserva = new ReservaHora(req.body);
+        const nuevaReserva = new Reserva(req.body);
         await nuevaReserva.save();
         res.status(201).json({ mensaje: "Reserva creada con éxito", reserva: nuevaReserva });
     } catch (error) {
@@ -131,12 +131,38 @@ router.get("/reservas", async (req, res) => {
     try {
         // Usamos la versión con .populate si tienes esas relaciones definidas en tu modelo, 
         // o simplemente ReservaHora.find() si prefieres una lista básica.
-        const reservas = await ReservaHora.find(); 
+        const reservas = await Reserva.find();
         return res.status(200).send({ status: "success", total: reservas.length, reservas });
     } catch (error) {
         console.error("Error al obtener reservas:", error);
         return res.status(500).send({ status: "error", message: error.message });
     }
 });
+// DELETE - Eliminar reserva por ID
+router.delete("/reservas/:id", async (req, res) => {
+    try {
 
+        const reservaEliminada = await Reserva.findByIdAndDelete(req.params.id);
+
+        if (!reservaEliminada) {
+            return res.status(404).json({
+                status: "error",
+                message: "Reserva no encontrada"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Reserva eliminada correctamente"
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+
+    }
+});
 module.exports = router;

@@ -337,6 +337,262 @@ document.querySelector("[data-checkout]").addEventListener("click", () => {
 });
 
 // Render inicial de la tienda.
+document.getElementById("cancelar-reserva-btn")
+?.addEventListener("click", () => {
+
+  const modalHTML = `
+    <div id="cancelar-modal" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    ">
+
+      <div style="
+        background: white;
+        width: 380px;
+        padding: 25px;
+        border-radius: 10px;
+        color: black;
+        font-family: sans-serif;
+      ">
+
+        <h3>Cancelar Reserva</h3>
+
+        <label>
+          Nombre utilizado en la reserva:
+        </label>
+
+        <input
+          type="text"
+          id="buscar-cliente"
+          style="
+            width:100%;
+            padding:8px;
+            margin-top:8px;
+            margin-bottom:12px;
+            border:1px solid #ccc;
+            border-radius:4px;
+          "
+        >
+
+        <button
+          id="buscar-reserva"
+          style="
+            width:100%;
+            padding:10px;
+            background:black;
+            color:white;
+            border:none;
+            border-radius:4px;
+            cursor:pointer;
+          "
+        >
+          Buscar Reserva
+        </button>
+
+        <div id="resultado-reserva" style="margin-top:15px;"></div>
+
+        <button
+          id="cerrar-cancelacion"
+          style="
+            width:100%;
+            padding:10px;
+            margin-top:15px;
+            background:#e0e0e0;
+            border:none;
+            border-radius:4px;
+            cursor:pointer;
+          "
+        >
+          Cerrar
+        </button>
+
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+  document
+    .getElementById("cerrar-cancelacion")
+    .addEventListener("click", () => {
+      document.getElementById("cancelar-modal").remove();
+    });
+
+  document
+    .getElementById("buscar-reserva")
+    .addEventListener("click", async () => {
+
+      const nombreCliente =
+        document.getElementById("buscar-cliente").value.trim();
+
+      if (!nombreCliente) {
+        alert("Ingrese un nombre.");
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          "http://localhost:3900/api/reservas"
+        );
+
+        const data = await response.json();
+
+        const reservas = data.reservas || [];
+
+        const reservaEncontrada = reservas.find(
+          reserva =>
+            reserva.cliente.toLowerCase() ===
+            nombreCliente.toLowerCase()
+        );
+
+        const resultado =
+          document.getElementById("resultado-reserva");
+
+        if (!reservaEncontrada) {
+
+          resultado.innerHTML = `
+            <p style="color:red;">
+              No se encontró una reserva.
+            </p>
+          `;
+
+          return;
+        }
+
+        resultado.innerHTML = `
+          <div style="
+            border:1px solid #ddd;
+            padding:10px;
+            border-radius:6px;
+            margin-top:10px;
+          ">
+
+            <p><strong>Cliente:</strong>
+            ${reservaEncontrada.cliente}</p>
+
+            <p><strong>Fecha:</strong>
+            ${new Date(
+              reservaEncontrada.dia
+            ).toLocaleDateString()}</p>
+
+            <p><strong>Hora:</strong>
+            ${reservaEncontrada.hora}</p>
+
+            <p><strong>Profesional:</strong>
+            ${reservaEncontrada.profesional}</p>
+
+            <button
+              id="eliminar-reserva"
+              style="
+                width:100%;
+                padding:10px;
+                background:#c62828;
+                color:white;
+                border:none;
+                border-radius:4px;
+                cursor:pointer;
+              "
+            >
+              Eliminar Reserva
+            </button>
+
+          </div>
+        `;
+
+        document
+          .getElementById("eliminar-reserva")
+          .addEventListener("click", async () => {
+
+            const eliminar = await fetch(
+              `http://localhost:3900/api/reservas/${reservaEncontrada._id}`,
+              {
+                method: "DELETE"
+              }
+            );
+
+            if (!eliminar.ok) {
+
+              alert(
+                "No fue posible eliminar la reserva."
+              );
+
+              return;
+            }
+
+            document.getElementById("resultado-reserva").innerHTML = `
+  <div style="
+    text-align:center;
+    padding:20px;
+  ">
+
+    <h3 style="
+      color:green;
+      margin-bottom:10px;
+    ">
+      ✓ Reserva eliminada
+    </h3>
+
+    <p>
+      La reserva fue eliminada correctamente.
+    </p>
+
+    <p style="
+      color:#666;
+      font-size:14px;
+    ">
+      Se ha enviado una confirmación al correo registrado.
+    </p>
+
+    <button
+      id="cerrar-exito"
+      style="
+        margin-top:15px;
+        padding:10px 20px;
+        background:black;
+        color:white;
+        border:none;
+        border-radius:4px;
+        cursor:pointer;
+      "
+    >
+      Aceptar
+    </button>
+
+  </div>
+`;
+
+document
+  .getElementById("cerrar-exito")
+  .addEventListener("click", () => {
+    document
+      .getElementById("cancelar-modal")
+      .remove();
+  });
+
+          });
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Error de conexión con el servidor."
+        );
+
+      }
+
+    });
+
+});
 renderProducts();
 renderCart();
 refreshIcons();
