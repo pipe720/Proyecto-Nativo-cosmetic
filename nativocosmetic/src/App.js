@@ -1,17 +1,73 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
 import { MiContextoProvider } from "./MiContexto";
-import Home from './Home';
+import Home from "./Home";
+import NuevoProducto from "./NuevoProducto";
+import Pago from "./Pago";
+import Stock from "./Stock";
+import TiendaPublica from "./TiendaPublica";
 
-function App() {                    
-  return (   
+function App() {
+  return (
     <MiContextoProvider>
-    <Router>
-      <Routes>         
-         <Route path="/" element={<Home />} />
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/" element={<TiendaPublica />} />
+          <Route path="/pago" element={<Pago />} />
+          <Route path="/admin/*" element={<AdminPanel />} />
+        </Routes>
+      </Router>
+    </MiContextoProvider>
+  );
+}
+
+function AdminPanel() {
+  return (
+    <div>
+      <nav
+        style={{
+          backgroundColor: "#27AE60",
+          padding: "15px 25px",
+          display: "flex",
+          gap: "20px",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Link
+          to="/admin"
+          style={{ color: "white", textDecoration: "none", fontSize: "18px", fontWeight: "bold" }}
+        >
+          Nativo Admin
+        </Link>
+        <Link to="/admin" style={{ color: "white", textDecoration: "none" }}>
+          Inicio
+        </Link>
+        <Link to="/admin/nuevo-producto" style={{ color: "white", textDecoration: "none" }}>
+          Crear producto
+        </Link>
+        <Link to="/admin/stock" style={{ color: "white", textDecoration: "none" }}>
+          Stock
+        </Link>
+        <Link
+          to="/"
+          style={{
+            color: "#D5F4E6",
+            textDecoration: "none",
+            marginLeft: "auto",
+            fontSize: "14px",
+            fontWeight: "500",
+          }}
+        >
+          Ver tienda
+        </Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/nuevo-producto" element={<NuevoProducto />} />
+        <Route path="/stock" element={<Stock />} />
       </Routes>
-    </Router>
-  </MiContextoProvider>  
-    /*AQUI SE VAN A CARGAS LAS RUTAS con react-router-do */
+    </div>
   );
 }
 
