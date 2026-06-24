@@ -29,14 +29,11 @@ const ProductoSchema = Schema({
     fechavencimiento: {
         type: Date,
         default: Date.now
+    },
+    imagenUrl: {
+        type: String,
+        default: null
     }
 });
 
-
-
-
-
-
-
-
-module.exports = model("Producto", ArticuloSchema, "productos");
+module.exports = model("Producto", ProductoSchema, "productos");

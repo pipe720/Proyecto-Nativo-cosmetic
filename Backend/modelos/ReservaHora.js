@@ -1,26 +1,30 @@
-const { Schema, model, mongoose } = require("mongoose");
+const mongoose = require('mongoose');
 
-const ReservaHoraSchema = Schema({
-    idreserva: {
-        type: String,
-        required: true
-    },
-    fechareserva: {
+const ReservaSchema = new mongoose.Schema({
+    dia: {
         type: Date,
         required: true
     },
-    cliente: { 
-        // Usamos Schema.Types.ObjectId porque ya importamos Schema arriba
-        type: Schema.Types.ObjectId, 
-        ref: "Cliente",
+    hora: {
+        type: String,
         required: true
     },
-    servicio: { 
-        type: String, 
-        ref: 'Servicio',
+    profesional: {
+        type: String,
         required: true
+    },
+    tipoCorte: {
+        type: String,
+        required: true
+    },
+    cliente: {
+        type: String, // O puedes poner un ref: 'Usuario' si tienes el modelo de usuario
+        required: true
+    },
+    estado: {
+        type: String,
+        default: 'pendiente'
     }
 });
 
-// El tercer parámetro es el nombre de la colección en la base de datos
-module.exports = model("ReservaHora", ReservaHoraSchema, "reservahoras");
+module.exports = mongoose.model('ReservaHora', ReservaSchema);

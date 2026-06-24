@@ -13,18 +13,16 @@ const PagoSchema = Schema({
         type: String,
         required: true
     },
-    pedido: {   // para sacar costo del pedido
-                // //para referenciar al pedido, se puede extraer todos los datos de ahi
-        type: mongoose.Schema.Types.ObjectId, ref: 'Pedido',
-        required: null
+    pedido: {
+        type: Schema.Types.ObjectId,
+        ref: 'Pedido',
+        required: false
     },
-
     servicio: {
-                //Para sacar costo del servicio en la reserva, 
-                // //para referenciar al producto, se pued extraer todos los datos de ahi
-        type: mongoose.Schema.Types.ObjectId, ref: 'Servicio',
-        required: null
-    },
+        type: Schema.Types.ObjectId,
+        ref: 'Servicio',
+        required: false
+    }
 });
 
-module.exports = model("Pago", ArticuloSchema, "pagos");
+module.exports = model("Pago", PagoSchema, "pagos");

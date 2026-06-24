@@ -21,4 +21,4 @@ const ClienteSchema = Schema({
 });
 
 
-module.exports = model("Cliente", ArticuloSchema, "clientes");
+module.exports = model("Cliente", ClienteSchema, "clientes");
