@@ -354,7 +354,6 @@ function Pago() {
           </div>
           <div className="sandbox-help">
             <strong>Tarjetas de prueba</strong>
-            <span>Aprobado: 4242 4242 4242 4242.</span>
             <span>Rechazado: 4000 0000 0000 0002.</span>
             <span>Error de conexion: 4000 0000 0000 9995.</span>
           </div>

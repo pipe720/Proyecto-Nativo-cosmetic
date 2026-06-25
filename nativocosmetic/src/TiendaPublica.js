@@ -25,7 +25,6 @@ import {
   X,
 } from "lucide-react";
 import {
-  AGENDAPRO_URL,
   API_BASE_URL,
   formatPrice,
   needFilters,
@@ -41,7 +40,6 @@ const iconByName = {
 };
 
 const professionals = ["Felipe Valenzuela", "Elias Sanchez", "Renato Arcos"];
-const serviceTypes = ["Corte Mujer", "Corte Hombre", "Tintura / Coloracion"];
 
 function getTodayInputValue() {
   const now = new Date();
@@ -52,6 +50,7 @@ function getTodayInputValue() {
 function TiendaPublica() {
   const navigate = useNavigate();
   const [apiProducts, setApiProducts] = useState([]);
+  const [services, setServices] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productError, setProductError] = useState("");
   const [activeFilter, setActiveFilter] = useState("todos");
@@ -80,8 +79,30 @@ function TiendaPublica() {
         if (mounted) setLoadingProducts(false);
       }
     }
+    async function loadServices() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/servicios`);
 
+    if (!response.ok) {
+      throw new Error("No fue posible cargar los servicios.");
+    }
+
+    const data = await response.json();
+
+    if (!mounted) return;
+
+    setServices(data);
+  } catch (error) {
+    console.error(error);
+
+    if (!mounted) return;
+
+    setServices([]);
+  }
+}
     loadProducts();
+    loadServices();
+
     const interval = window.setInterval(loadProducts, 15000);
     return () => {
       mounted = false;
@@ -186,10 +207,14 @@ function TiendaPublica() {
         </nav>
 
         <div className="header-actions">
-          <a className="ghost-action" href={AGENDAPRO_URL} target="_blank" rel="noreferrer">
-            <CalendarDays />
-            Reservar
-          </a>
+          <button
+    className="ghost-action"
+    type="button"
+    onClick={() => openReservation("create")}
+>
+    <CalendarDays />
+    Reservar
+</button>
           {/* Lógica de sesión: Si está logeado muestra sus opciones, si no, el icono de login */}
 {usuarioLogeado ? (
   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -259,10 +284,14 @@ function TiendaPublica() {
                 <ShoppingBag />
                 Comprar productos
               </a>
-              <a className="button secondary" href={AGENDAPRO_URL} target="_blank" rel="noreferrer">
-                <CalendarCheck />
-                Reservar en Agendapro
-              </a>
+              <button
+    className="button secondary"
+    type="button"
+    onClick={() => openReservation("create")}
+>
+    <CalendarCheck />
+    Reservar hora
+</button>
             </div>
           </div>
         </section>
@@ -394,10 +423,14 @@ function TiendaPublica() {
             </p>
           </div>
           <div className="booking-actions">
-            <a className="button primary dark" href={AGENDAPRO_URL} target="_blank" rel="noreferrer">
-              <CalendarDays />
-              Tomar hora en Agendapro
-            </a>
+            <button
+  className="button secondary"
+  type="button"
+  onClick={() => openReservation("create")}
+>
+  <CalendarDays />
+  Reservar hora
+</button>
             <button className="button secondary" type="button" onClick={() => openReservation("cancel")}>
               Cancelar reserva
             </button>
@@ -491,10 +524,14 @@ function TiendaPublica() {
             <CreditCard />
             Continuar pago
           </button>
-          <a className="button secondary full" href={AGENDAPRO_URL} target="_blank" rel="noreferrer">
-            <CalendarCheck />
-            Reservar servicio
-          </a>
+          <button
+  className="button secondary full"
+  type="button"
+  onClick={() => openReservation("create")}
+>
+  <CalendarCheck />
+  Reservar servicio
+</button>
         </div>
       </aside>
       <button
@@ -505,10 +542,17 @@ function TiendaPublica() {
       />
 
       {reservationState.mode === "create" && (
-        <CreateReservationModal product={reservationState.product} onClose={closeReservation} />
+       <CreateReservationModal
+    product={reservationState.product}
+    services={services}
+    onClose={closeReservation}
+/>
       )}
       {reservationState.mode === "cancel" && <CancelReservationModal onClose={closeReservation} />}
-      {reservationState.mode === "edit" && <EditReservationModal onClose={closeReservation} />}
+      {reservationState.mode === "edit" && <EditReservationModal
+  services={services}
+  onClose={closeReservation}
+/>}
 
       <footer className="site-footer">
         <strong>Nativo Cosmetic</strong>
@@ -534,7 +578,7 @@ function Modal({ title, children, onClose }) {
   );
 }
 
-function CreateReservationModal({ product, onClose }) {
+function CreateReservationModal({ product, services, onClose }) {
   const [form, setForm] = useState({
     cliente: "",
     dia: "",
@@ -611,11 +655,14 @@ function CreateReservationModal({ product, onClose }) {
           Tipo de corte
           <select name="tipoCorte" value={form.tipoCorte} onChange={updateField} required>
             <option value="">Selecciona un estilo...</option>
-            {serviceTypes.map((type) => (
-              <option value={type} key={type}>
-                {type}
-              </option>
-            ))}
+            {services.map((service) => (
+  <option
+    key={service._id}
+    value={service.nombreservicio}
+  >
+    {service.nombreservicio}
+  </option>
+))}
           </select>
         </label>
         {status && <p className={`form-status ${status.type}`}>{status.message}</p>}
@@ -718,7 +765,7 @@ function CancelReservationModal({ onClose }) {
   );
 }
 
-function EditReservationModal({ onClose }) {
+function EditReservationModal({ services, onClose }) {
   const [searchName, setSearchName] = useState("");
   const [reservation, setReservation] = useState(null);
   const [form, setForm] = useState({
@@ -828,11 +875,14 @@ function EditReservationModal({ onClose }) {
               Tipo de corte
               <select name="tipoCorte" value={form.tipoCorte} onChange={updateField} required>
                 <option value="">Selecciona un estilo...</option>
-                {serviceTypes.map((type) => (
-                  <option value={type} key={type}>
-                    {type}
-                  </option>
-                ))}
+                {services.map((service) => (
+  <option
+    key={service._id}
+    value={service.nombreservicio}
+  >
+    {service.nombreservicio}
+  </option>
+))}
               </select>
             </label>
             <button className="button primary full" type="submit">

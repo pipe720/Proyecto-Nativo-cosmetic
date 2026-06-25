@@ -7,6 +7,7 @@ import Pago from "./Pago";
 import Stock from "./Stock";
 import TiendaPublica from "./TiendaPublica";
 import Iniciosesion from "./Iniciosesion";
+import Registro from "./Registro";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<TiendaPublica />} />
           <Route path="/pago" element={<Pago />} />
           <Route path="/iniciosesion" element={<Iniciosesion />} />
+          <Route path="/registro" element={<Registro />} />
           <Route
             path="/admin/*"
             element={

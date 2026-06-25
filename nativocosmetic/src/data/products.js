@@ -1,7 +1,5 @@
 export const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3900";
 
-export const AGENDAPRO_URL = "https://www.agendapro.com/";
-
 export const needFilters = [
   { id: "todos", label: "Todo", icon: "sparkles" },
   { id: "hidratacion", label: "Hidratacion", icon: "droplets" },
@@ -46,10 +44,8 @@ function resolveImageUrl(imageUrl) {
 
 function isBookingProduct(product) {
   const price = Number(product.precioproducto || 0);
-  const category = withoutAccents(product.categoriaproducto);
-  const name = withoutAccents(product.nombreproducto);
 
-  return price <= 0 || category.includes("color") || name.includes("tintura");
+  return price <= 0;
 }
 
 export function mapBackendProduct(product) {
